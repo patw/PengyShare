@@ -2,6 +2,12 @@
 
 A self-hosted image **and video** hosting service. Upload a photo or a GoPro clip, get a short shareable URL — paste the direct link into Discord, Google Chat, or any chat for an inline preview.
 
+## Screenshot
+
+<img src="docs/screenshot.png" alt="PengyShare gallery" width="720">
+
+The mixed gallery — image cards sit alongside video cards (poster frame + play badge).
+
 ## Features
 
 - Upload **images** (`jpg`, `jpeg`, `png`, `gif`, `webp`, `bmp`, `tiff`, `svg`) and **videos** (`mp4`, `mov`, `m4v`, `webm`, `mkv`)
