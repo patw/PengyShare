@@ -1,0 +1,16 @@
+
+[Unit]
+Description=PengyShare
+After=network-online.target
+
+[Service]
+User=beholder
+Group=beholder
+Restart=always
+SyslogIdentifier=pengyshare
+WorkingDirectory=/home/beholder/PengyShare
+ExecStart=/home/beholder/PengyShare/pengyshare.sh
+Environment=HOME=/home/beholder
+
+[Install]
+WantedBy=multi-user.target

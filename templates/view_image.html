@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ meta.filename }} — PengyShare</title>
+<meta property="og:title" content="{{ meta.filename }}">
+<meta property="og:type" content="{% if is_video %}video.other{% else %}website{% endif %}">
+<meta property="og:url" content="{{ base_url }}/{{ meta.slug }}">
+{% if has_thumb %}<meta property="og:image" content="{{ base_url }}/thumb/{{ meta.slug }}">{% endif %}
+{% if is_video %}
+<meta property="og:video:url" content="{{ base_url }}/img/{{ meta.slug }}">
+<meta property="og:video:secure_url" content="{{ base_url }}/img/{{ meta.slug }}">
+<meta property="og:video:type" content="{{ meta.mime_type }}">
+{% endif %}
+<meta name="twitter:card" content="summary_large_image">
+{% if has_thumb %}<meta name="twitter:image" content="{{ base_url }}/thumb/{{ meta.slug }}">{% endif %}
+<style>
+  :root { --bg: #ffffff; --fg: #1f2328; --accent: #0969da; --border: #d0d7de; --card: #f6f8fa; --hover: #e8ecf0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+         background: var(--bg); color: var(--fg); max-width: 960px; margin: 0 auto; padding: 1.5rem 1rem; }
+  h1 { font-size: 1.2rem; margin-bottom: 0.5rem; }
+  h1 a { color: var(--fg); text-decoration: none; }
+  .meta { color: #656d76; font-size: 0.85rem; margin-bottom: 1rem; }
+  .meta span { margin-right: 1rem; }
+  .media-container { background: #0b0d10; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; text-align: center; }
+  .media-container img { max-width: 100%; max-height: 80vh; display: block; margin: 0 auto; }
+  .media-container video { width: 100%; max-height: 80vh; display: block; margin: 0 auto; background: #000; }
+  .actions { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
+  .btn { display: inline-block; padding: 0.45rem 0.9rem; border: 1px solid var(--border);
+         border-radius: 6px; color: var(--accent); text-decoration: none; font-size: 0.85rem; background: var(--card); cursor: pointer; }
+  .btn:hover { background: var(--hover); border-color: var(--accent); }
+  .btn-delete { color: #cf222e; border-color: #cf222e; }
+  .btn-delete:hover { background: #fff0f0; }
+  .btn-copy { background: var(--card); border: 1px solid var(--border); border-radius: 4px; color: var(--accent);
+              cursor: pointer; font-size: 0.9rem; padding: 0.3rem 0.5rem; line-height: 1.4; white-space: nowrap; }
+  .btn-copy:hover { background: var(--hover); border-color: var(--accent); }
+  .url-box { margin-top: 1rem; background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 0.75rem; }
+  .url-box label { font-size: 0.75rem; color: #656d76; display: block; margin-bottom: 0.3rem; }
+  .url-box input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
+                   padding: 0.4rem 0.6rem; color: var(--fg); font-size: 0.85rem; font-family: monospace; }
+  .url-box input:focus { outline: none; border-color: var(--accent); }
+  .embed-box { margin-top: 0.75rem; }
+  .embed-box label { font-size: 0.75rem; color: #656d76; display: block; margin-bottom: 0.3rem; }
+  .embed-box input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
+                     padding: 0.4rem 0.6rem; color: var(--fg); font-size: 0.85rem; font-family: monospace; }
+  .back { display: inline-block; margin-top: 1.5rem; color: var(--accent); text-decoration: none; font-size: 0.85rem; }
+  .back:hover { text-decoration: underline; }
+  .unlisted-badge { background: #e8ecf0; border-radius: 3px; padding: 0.1em 0.45em; font-size: 0.78em; font-weight: 500; color: #656d76; }
+  .kind-badge { background: #e8ecf0; border-radius: 3px; padding: 0.1em 0.45em; font-size: 0.78em; font-weight: 500; color: #0969da; }
+</style>
+</head>
+<body>
+<h1><a href="{{ base_url }}/">🖼️</a> {{ meta.filename }}</h1>
+
+<div class="meta">
+  <span>📅 {{ meta.created_at[:19]|replace('T', ' ') }}</span>
+  <span>📦 {{ format_size(meta.file_size) }}</span>
+  <span>📎 {{ meta.mime_type }}</span>
+  <span class="kind-badge">{{ 'video' if is_video else 'image' }}</span>
+  {% if meta.unlisted %}<span class="unlisted-badge">unlisted</span>{% endif %}
+</div>
+
+<div class="media-container">
+  {% if is_video %}
+  <video controls preload="metadata" poster="{{ base_url }}/thumb/{{ meta.slug }}">
+    <source src="{{ base_url }}/img/{{ meta.slug }}" type="{{ meta.mime_type }}">
+    Your browser doesn't support HTML5 video.
+  </video>
+  {% else %}
+  <img src="{{ base_url }}/img/{{ meta.slug }}" alt="{{ meta.filename }}">
+  {% endif %}
+</div>
+
+<div class="actions">
+  <a href="{{ base_url }}/{{ meta.slug }}/download" class="btn">⬇ download</a>
+  <a href="{{ base_url }}/" class="btn">← all files</a>
+  {% if can_delete %}
+  <form method="post" action="{{ base_url }}/{{ meta.slug }}/delete" onsubmit="return confirm('Delete this file?')" style="margin:0">
+    <button type="submit" class="btn btn-delete">delete</button>
+  </form>
+  {% endif %}
+</div>
+
+<div class="url-box">
+  <label>Page URL</label>
+  <div style="display:flex;gap:0.4rem;">
+    <input type="text" value="{{ base_url }}/{{ meta.slug }}" readonly onclick="this.select()" style="flex:1">
+    <button class="btn-copy" onclick="copyUrl(this)" title="Copy to clipboard">📋</button>
+  </div>
+</div>
+
+<div class="embed-box">
+  <label>Direct {{ 'video' if is_video else 'image' }} URL{% if is_video %} (paste this in Discord / Google Chat){% endif %}</label>
+  <div style="display:flex;gap:0.4rem;">
+    <input type="text" value="{{ base_url }}/img/{{ meta.slug }}" readonly onclick="this.select()" style="flex:1">
+    <button class="btn-copy" onclick="copyUrl(this)" title="Copy to clipboard">📋</button>
+  </div>
+</div>
+
+<div class="embed-box">
+  <label>Markdown</label>
+  <div style="display:flex;gap:0.4rem;">
+    {% if is_video %}
+    <input type="text" value="[&amp;gt;&amp;gt; {{ meta.filename }}]({{ base_url }}/{{ meta.slug }})" readonly onclick="this.select()" style="flex:1">
+    {% else %}
+    <input type="text" value="![{{ meta.filename }}]({{ base_url }}/img/{{ meta.slug }})" readonly onclick="this.select()" style="flex:1">
+    {% endif %}
+    <button class="btn-copy" onclick="copyUrl(this)" title="Copy to clipboard">📋</button>
+  </div>
+</div>
+
+<div class="embed-box">
+  <label>HTML {% if is_video %}video{% else %}img{% endif %} tag</label>
+  <div style="display:flex;gap:0.4rem;">
+    {% if is_video %}
+    <input type="text" value='&lt;video controls src="{{ base_url }}/img/{{ meta.slug }}"&gt;' readonly onclick="this.select()" style="flex:1">
+    {% else %}
+    <input type="text" value='<img src="{{ base_url }}/img/{{ meta.slug }}" alt="{{ meta.filename }}">' readonly onclick="this.select()" style="flex:1">
+    {% endif %}
+    <button class="btn-copy" onclick="copyUrl(this)" title="Copy to clipboard">📋</button>
+  </div>
+</div>
+
+<script>
+function copyUrl(btn) {
+  const input = btn.parentElement.querySelector('input');
+  input.select();
+  navigator.clipboard.writeText(input.value).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✅';
+    setTimeout(() => btn.textContent = orig, 1500);
+  });
+}
+</script>
+
+<a href="{{ base_url }}/" class="back">← back to all files</a>
+
+<footer style="margin-top:2rem;padding-top:1rem;border-top:1px solid var(--border);font-size:0.75rem;color:#8b949e;text-align:center;">
+  PengyShare — self-hosted image &amp; video hosting
+</footer>
+
+</body>
+</html>
